@@ -264,14 +264,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-app.get("/tes", (req, res) => {
-  res.json({
-    status: "SERVER BARU",
-    register: true
-  });
-});
-
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`==========================================`);
   console.log(`🚀 SERVER TRANSAKSI & ADMIN JALAN DI PORT ${PORT}`);
   console.log(`==========================================`);
