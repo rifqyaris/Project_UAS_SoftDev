@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://project-uas-soft-dev-production.up.railway.app");
 
 function ChatContent() {
   const searchParams = useSearchParams();
@@ -22,7 +22,7 @@ function ChatContent() {
   const [currentMessage, setCurrentMessage] = useState("");
 
   const fetchRooms = (userId: string) => {
-    fetch(`http://localhost:5000/api/chat/rooms/${userId}`)
+    fetch(`https://project-uas-soft-dev-production.up.railway.app${userId}`)
       .then(res => res.json())
       .then(data => setChatRooms(data));
   };
@@ -46,7 +46,7 @@ function ChatContent() {
       setActiveBarangName(urlBarang || "Barang");
     }
 
-    fetch(`http://localhost:5000/api/chat/rooms/${parsedUser._id}`)
+    fetch(`https://project-uas-soft-dev-production.up.railway.app${parsedUser._id}`)
       .then(res => res.json())
       .then(data => {
         setChatRooms(data);
@@ -69,7 +69,7 @@ function ChatContent() {
 
     socket.emit("join_room", activeRoom);
 
-    fetch(`http://localhost:5000/api/chat/messages/${activeRoom}`)
+    fetch(`https://project-uas-soft-dev-production.up.railway.app${activeRoom}`)
       .then(res => res.json())
       .then(data => setMessageList(data));
 
