@@ -33,8 +33,10 @@ app.use(cors({
     "http://localhost:3000",
     "https://project-uas-soft-dev.vercel.app"
   ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
+
 app.options("*", cors());
 app.use(express.json({ limit: "10mb" })); 
 

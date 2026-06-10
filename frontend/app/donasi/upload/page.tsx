@@ -47,7 +47,7 @@ export default function UploadDonasiPage() {
     }
 
     try {
-      const res = await fetch("https://project-uas-soft-dev-production.up.railway.app", {
+      const res = await fetch("projectuassoftdev-production.up.railway.app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
