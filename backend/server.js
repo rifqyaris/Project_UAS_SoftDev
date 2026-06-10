@@ -28,8 +28,18 @@ const io = new Server(server, {
   }
 });
 
-app.use(cors()); 
-app.use(express.json({ limit: "10mb" })); 
+app.use(cors({
+  origin: [
+    "https://project-uas-soft-dev.vercel.app", 
+    "http://localhost:3000"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  credentials: true 
+}));
+
+app.options("*", cors()); 
+app.use(express.json({ limit: "10mb" }));
 
 const USERS_DB = [
   { _id: "mock_admin_99", nama: "Admin DonasiKu", email: "admin@donasiku.com", password: "admin", role: "Admin" },
