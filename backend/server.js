@@ -19,7 +19,7 @@ const ChatModel = mongoose.model("Chat", new mongoose.Schema({}, { strict: false
 const MessageModel = mongoose.model("Message", new mongoose.Schema({}, { strict: false }));
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -29,10 +29,13 @@ const io = new Server(server, {
 });
 
 app.use(cors({
-  origin: "*", 
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: [
+    "http://localhost:3000",
+    "https://project-uas-soft-dev.vercel.app"
+  ],
   credentials: true
 }));
+app.options("*", cors());
 app.use(express.json({ limit: "10mb" })); 
 
 const USERS_DB = [
@@ -117,26 +120,6 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("--- DEBUG LOGIN ---");
-  console.log("Diterima Email:", email);
-  console.log("Diterima Password:", password);
-  console.log("Total User di DB:", USERS_DB.length);
-  console.log("User pertama di DB:", USERS_DB[0]); 
-
-  const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
-    return res.status(400).json({ message: "Salah." });
-  }
-  
-  console.log("✅ SUKSES Login:", user.email);
-  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
-});
-
 app.get("/api/admin/stats", (req, res) => {
   const tersalurkan = BARANG_DB.filter(b => b.status === "Tersalurkan").length;
   const tersedia = BARANG_DB.length - tersalurkan;
@@ -147,25 +130,6 @@ app.get("/api/admin/transaksi", (req, res) => res.json(TRANSACTIONS_DB));
 
 app.get("/api/barang", (req, res) => res.json(BARANG_DB));
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("--- DEBUG LOGIN ---");
-  console.log("Diterima Email:", email);
-  console.log("Diterima Password:", password);
-  console.log("Total User di DB:", USERS_DB.length);
-  console.log("User pertama di DB:", USERS_DB[0]); 
-
-  const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
-    return res.status(400).json({ message: "Salah." });
-  }
-  
-  console.log("✅ SUKSES Login:", user.email);
-  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
-});
 
 app.put("/api/barang/:id/selesai", (req, res) => {
   const b = BARANG_DB.find(x => x._id === req.params.id);
@@ -185,25 +149,6 @@ app.delete("/api/barang/:id", (req, res) => {
   } else res.status(404).json({ message: "Barang tidak ditemukan" });
 });
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("--- DEBUG LOGIN ---");
-  console.log("Diterima Email:", email);
-  console.log("Diterima Password:", password);
-  console.log("Total User di DB:", USERS_DB.length);
-  console.log("User pertama di DB:", USERS_DB[0]); 
-
-  const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
-    return res.status(400).json({ message: "Salah." });
-  }
-  
-  console.log("✅ SUKSES Login:", user.email);
-  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
-});
 
 app.get("/api/chat/rooms/:userId", (req, res) => res.json(CHATS_DB.filter(c => c.donaturId === req.params.userId || c.peminatId === req.params.userId)));
 app.get("/api/chat/messages/:room", (req, res) => res.json(MESSAGES_DB.filter(m => m.room === req.params.room)));
@@ -216,25 +161,6 @@ app.put("/api/notif/baca/:userId", (req, res) => {
   res.json({ message: "Dibaca" });
 });
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("--- DEBUG LOGIN ---");
-  console.log("Diterima Email:", email);
-  console.log("Diterima Password:", password);
-  console.log("Total User di DB:", USERS_DB.length);
-  console.log("User pertama di DB:", USERS_DB[0]); 
-
-  const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
-    return res.status(400).json({ message: "Salah." });
-  }
-  
-  console.log("✅ SUKSES Login:", user.email);
-  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
-});
 
 app.put("/api/transaksi/update", (req, res) => {
   const { txId, status, tracking, peminatId } = req.body;
