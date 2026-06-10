@@ -99,35 +99,41 @@ io.on("connection", (socket) => {
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
-  
-  // TAMBAHKAN DEBUG INI
-  console.log("🔍 Coba login:", email, password);
-  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
-  
+
+  console.log("--- DEBUG LOGIN ---");
+  console.log("Diterima Email:", email);
+  console.log("Diterima Password:", password);
+  console.log("Total User di DB:", USERS_DB.length);
+  console.log("User pertama di DB:", USERS_DB[0]); 
+
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
   if (!user) {
-    console.log("❌ User tidak ditemukan!");
+    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
     return res.status(400).json({ message: "Salah." });
   }
   
+  console.log("✅ SUKSES Login:", user.email);
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
-  
-  // TAMBAHKAN DEBUG INI
-  console.log("🔍 Coba login:", email, password);
-  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
-  
+
+  console.log("--- DEBUG LOGIN ---");
+  console.log("Diterima Email:", email);
+  console.log("Diterima Password:", password);
+  console.log("Total User di DB:", USERS_DB.length);
+  console.log("User pertama di DB:", USERS_DB[0]); 
+
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
   if (!user) {
-    console.log("❌ User tidak ditemukan!");
+    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
     return res.status(400).json({ message: "Salah." });
   }
   
+  console.log("✅ SUKSES Login:", user.email);
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
@@ -143,18 +149,21 @@ app.get("/api/barang", (req, res) => res.json(BARANG_DB));
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
-  
-  // TAMBAHKAN DEBUG INI
-  console.log("🔍 Coba login:", email, password);
-  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
-  
+
+  console.log("--- DEBUG LOGIN ---");
+  console.log("Diterima Email:", email);
+  console.log("Diterima Password:", password);
+  console.log("Total User di DB:", USERS_DB.length);
+  console.log("User pertama di DB:", USERS_DB[0]); 
+
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
   if (!user) {
-    console.log("❌ User tidak ditemukan!");
+    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
     return res.status(400).json({ message: "Salah." });
   }
   
+  console.log("✅ SUKSES Login:", user.email);
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
@@ -178,18 +187,21 @@ app.delete("/api/barang/:id", (req, res) => {
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
-  
-  // TAMBAHKAN DEBUG INI
-  console.log("🔍 Coba login:", email, password);
-  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
-  
+
+  console.log("--- DEBUG LOGIN ---");
+  console.log("Diterima Email:", email);
+  console.log("Diterima Password:", password);
+  console.log("Total User di DB:", USERS_DB.length);
+  console.log("User pertama di DB:", USERS_DB[0]); 
+
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
   if (!user) {
-    console.log("❌ User tidak ditemukan!");
+    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
     return res.status(400).json({ message: "Salah." });
   }
   
+  console.log("✅ SUKSES Login:", user.email);
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
@@ -206,18 +218,21 @@ app.put("/api/notif/baca/:userId", (req, res) => {
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
-  
-  // TAMBAHKAN DEBUG INI
-  console.log("🔍 Coba login:", email, password);
-  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
-  
+
+  console.log("--- DEBUG LOGIN ---");
+  console.log("Diterima Email:", email);
+  console.log("Diterima Password:", password);
+  console.log("Total User di DB:", USERS_DB.length);
+  console.log("User pertama di DB:", USERS_DB[0]); 
+
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
   if (!user) {
-    console.log("❌ User tidak ditemukan!");
+    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
     return res.status(400).json({ message: "Salah." });
   }
   
+  console.log("✅ SUKSES Login:", user.email);
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
