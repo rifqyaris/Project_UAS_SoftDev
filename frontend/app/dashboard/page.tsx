@@ -4,9 +4,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { io } from "socket.io-client";
-const socket = io("projectuassoftdev-production.up.railway.app");
+const socket = io("https://projectuassoftdev-production.up.railway.app");
 
-const API = "projectuassoftdev-production.up.railway.app";
+const API = "https://projectuassoftdev-production.up.railway.app";
 
 function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) {
   const unread = notifs?.filter((n: any) => !n.dibaca).length || 0;
