@@ -97,20 +97,37 @@ io.on("connection", (socket) => {
   });
 });
 
-app.post("/api/auth/register", (req, res) => {
-  const { nama, email, password, role } = req.body;
-  const newUser = { _id: "user_" + Date.now(), nama, email, password, role: role || "Donatur" };
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
   
-  USERS_DB.push(newUser);
-  new UserModel(newUser).save().catch(console.log); 
+  // TAMBAHKAN DEBUG INI
+  console.log("🔍 Coba login:", email, password);
+  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
   
-  res.status(201).json({ message: "Sukses", user: newUser });
+  const user = USERS_DB.find((u) => u.email === email && u.password === password);
+  
+  if (!user) {
+    console.log("❌ User tidak ditemukan!");
+    return res.status(400).json({ message: "Salah." });
+  }
+  
+  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
 app.post("/api/auth/login", (req, res) => {
   const { email, password } = req.body;
+  
+  // TAMBAHKAN DEBUG INI
+  console.log("🔍 Coba login:", email, password);
+  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
+  
   const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  if (!user) return res.status(400).json({ message: "Salah." });
+  
+  if (!user) {
+    console.log("❌ User tidak ditemukan!");
+    return res.status(400).json({ message: "Salah." });
+  }
+  
   res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
@@ -124,14 +141,21 @@ app.get("/api/admin/transaksi", (req, res) => res.json(TRANSACTIONS_DB));
 
 app.get("/api/barang", (req, res) => res.json(BARANG_DB));
 
-app.post("/api/barang", (req, res) => {
-  let { namaBarang, kategori, deskripsi, foto, stok, kondisi, donaturNama, donaturId } = req.body;
-  const newBarang = { _id: "barang_" + Date.now(), namaBarang, kategori, deskripsi, stok: stok || "1 Pcs", kondisi: kondisi || "Layak", tanggalUpload: new Date().toLocaleDateString("id-ID"), donatur: { _id: donaturId || "user_1", nama: donaturNama }, foto: foto || "", status: "Tersedia" };
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
   
-  BARANG_DB.push(newBarang);
-  new BarangModel(newBarang).save().catch(console.log);
+  // TAMBAHKAN DEBUG INI
+  console.log("🔍 Coba login:", email, password);
+  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
   
-  res.status(201).json(newBarang);
+  const user = USERS_DB.find((u) => u.email === email && u.password === password);
+  
+  if (!user) {
+    console.log("❌ User tidak ditemukan!");
+    return res.status(400).json({ message: "Salah." });
+  }
+  
+  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
 app.put("/api/barang/:id/selesai", (req, res) => {
@@ -152,14 +176,21 @@ app.delete("/api/barang/:id", (req, res) => {
   } else res.status(404).json({ message: "Barang tidak ditemukan" });
 });
 
-app.post("/api/chat/init", (req, res) => {
-  let { room, barangId, barangNama, donaturId, donaturNama, peminatId, peminatNama } = req.body;
-  if (!CHATS_DB.find(c => c.room === room)) {
-    const newRoom = { room, barangId, barangNama, donaturId: donaturId || "user_1", donaturNama, peminatId, peminatNama, lastMessage: "Belum ada pesan.", time: "" };
-    CHATS_DB.push(newRoom);
-    new ChatModel(newRoom).save().catch(console.log);
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
+  
+  // TAMBAHKAN DEBUG INI
+  console.log("🔍 Coba login:", email, password);
+  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
+  
+  const user = USERS_DB.find((u) => u.email === email && u.password === password);
+  
+  if (!user) {
+    console.log("❌ User tidak ditemukan!");
+    return res.status(400).json({ message: "Salah." });
   }
-  res.status(200).json({ message: "OK" });
+  
+  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
 app.get("/api/chat/rooms/:userId", (req, res) => res.json(CHATS_DB.filter(c => c.donaturId === req.params.userId || c.peminatId === req.params.userId)));
@@ -173,21 +204,21 @@ app.put("/api/notif/baca/:userId", (req, res) => {
   res.json({ message: "Dibaca" });
 });
 
-app.post("/api/transaksi/request", (req, res) => {
-  const { barangId, barangNama, peminatId, peminatNama, donaturId, alasan, metodeAmbil, dropPoint } = req.body;
-  const newTx = { _id: "tx_" + Date.now(), barangId, barangNama, peminatId, peminatNama, donaturId, alasan, metodeAmbil, dropPoint, status: "Menunggu Konfirmasi", tracking: "Permintaan diajukan oleh Penerima" };
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
   
-  TRANSACTIONS_DB.push(newTx);
-  new TransaksiModel(newTx).save().catch(console.log); 
+  // TAMBAHKAN DEBUG INI
+  console.log("🔍 Coba login:", email, password);
+  console.log("🔍 Jumlah user di DB:", USERS_DB.length);
   
-  const notif = { _id: Date.now(), userId: donaturId, pesan: `📦 ${peminatNama} mengirim formulir permintaan untuk: ${barangNama}`, dibaca: false };
-  NOTIF_DB.push(notif);
-  new NotifModel(notif).save().catch(console.log); 
-
-  io.to(donaturId).emit("notification", { message: `Ada permintaan barang baru!` });
-  io.to(donaturId).emit("refresh_notif");
+  const user = USERS_DB.find((u) => u.email === email && u.password === password);
   
-  res.status(201).json(newTx);
+  if (!user) {
+    console.log("❌ User tidak ditemukan!");
+    return res.status(400).json({ message: "Salah." });
+  }
+  
+  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
 });
 
 app.put("/api/transaksi/update", (req, res) => {
