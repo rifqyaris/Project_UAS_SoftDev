@@ -227,6 +227,43 @@ app.put("/api/transaksi/confirm-cancel", (req, res) => {
   } else res.status(404).json({ message: "Gagal" });
 });
 
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { nama, email, password } = req.body;
+
+    const existingUser = USERS_DB.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email sudah terdaftar"
+      });
+    }
+
+    const newUser = {
+      _id: `user_${Date.now()}`,
+      nama,
+      email,
+      password,
+      role: "Penerima"
+    };
+
+    USERS_DB.push(newUser);
+
+    await new UserModel(newUser).save();
+
+    res.status(201).json({
+      message: "Registrasi berhasil"
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`==========================================`);
   console.log(`🚀 SERVER TRANSAKSI & ADMIN JALAN DI PORT ${PORT}`);
