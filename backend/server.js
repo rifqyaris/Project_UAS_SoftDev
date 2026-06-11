@@ -52,8 +52,6 @@ async function loadDataDariMongo() {
 }
 loadDataDariMongo();
 
-// --- 2. BUNGKUS EXPRESS & SOCKET PAKE NEXT.JS ---
-nextApp.prepare().then(() => {
   const app = express();
   const PORT = process.env.PORT || 5000;
   const server = http.createServer(app);
@@ -65,7 +63,6 @@ nextApp.prepare().then(() => {
     }
   });
 
-  // CORS dibebasin total karena udah jalan di 1 rumah yang sama
   app.use(cors());
   app.use(express.json({ limit: "10mb" })); 
 
@@ -229,4 +226,3 @@ nextApp.prepare().then(() => {
     console.log(`🚀 MONOLITH SERVER JALAN DI PORT ${PORT}`);
     console.log(`==========================================`);
   });
-});
