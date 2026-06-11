@@ -47,20 +47,25 @@ export default function UploadDonasiPage() {
     }
 
     try {
-      const res = await fetch("", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          namaBarang,
-          kategori,
-          deskripsi,
-          stok,
-          kondisi,
-          foto: fotoBase64,
-          donaturNama: user?.nama || "Donatur Anonim",
-          donaturId: user?._id 
-        }),
-      });
+      const res = await fetch(
+  "https://exquisite-acceptance-production-3bb9.up.railway.app/api/barang",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      namaBarang,
+      kategori,
+      deskripsi,
+      stok,
+      kondisi,
+      foto: fotoBase64,
+      donaturNama: user?.nama || "Donatur Anonim",
+      donaturId: user?._id
+    }),
+  }
+);
 
       if (res.ok) {
         setSuccessModal(true);
