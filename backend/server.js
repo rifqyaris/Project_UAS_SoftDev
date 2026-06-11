@@ -4,8 +4,14 @@ import http from "http";
 import { Server } from "socket.io"; 
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import next from 'next';
 
 dotenv.config();
+
+// --- 1. SETUP NEXT.JS ---
+const dev = process.env.NODE_ENV !== "production";
+const nextApp = next({ dev });
+const nextHandler = nextApp.getRequestHandler();
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!"))
@@ -17,29 +23,6 @@ const UserModel = mongoose.model("User", new mongoose.Schema({ _id: String }, { 
 const NotifModel = mongoose.model("Notif", new mongoose.Schema({ _id: Number }, { strict: false }));
 const ChatModel = mongoose.model("Chat", new mongoose.Schema({}, { strict: false }));
 const MessageModel = mongoose.model("Message", new mongoose.Schema({}, { strict: false }));
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", 
-    methods: ["GET", "POST", "PUT", "DELETE"]
-  }
-});
-
-app.use(cors({
-  origin: [
-    "https://project-uas-soft-dev.vercel.app", 
-    "http://localhost:3000"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-  credentials: true 
-}));
-
-app.options("*", cors()); 
-app.use(express.json({ limit: "10mb" }));
 
 const USERS_DB = [
   { _id: "mock_admin_99", nama: "Admin DonasiKu", email: "admin@donasiku.com", password: "admin", role: "Admin" },
@@ -74,199 +57,185 @@ async function loadDataDariMongo() {
 }
 loadDataDariMongo();
 
-io.on("connection", (socket) => {
-  socket.on("join_user_global", (userId) => socket.join(userId));
-  socket.on("join_room", (room) => socket.join(room));
-
-  socket.on("send_message", (data) => {
-    MESSAGES_DB.push({ room: data.room, author: data.author, message: data.message, time: data.time });
-    new MessageModel({ room: data.room, author: data.author, message: data.message, time: data.time }).save().catch(console.log);
-
-    const roomExist = CHATS_DB.find(c => c.room === data.room);
-    if (roomExist) {
-      roomExist.lastMessage = data.message;
-      roomExist.time = data.time;
-      ChatModel.updateOne({ room: data.room }, { lastMessage: data.message, time: data.time }).catch(console.log);
-
-      io.to(roomExist.donaturId).emit("refresh_sidebar");
-      io.to(roomExist.peminatId).emit("refresh_sidebar");
-      
-      const targetId = data.author === roomExist.donaturNama ? roomExist.peminatId : roomExist.donaturId;
-      const notifData = { _id: Date.now(), userId: targetId, pesan: `💬 Pesan baru dari ${data.author}: ${data.message}`, dibaca: false };
-      
-      NOTIF_DB.push(notifData);
-      new NotifModel(notifData).save().catch(console.log); 
-
-      io.to(targetId).emit("notification", { message: `Ada pesan baru dari ${data.author}!` });
+// --- 2. BUNGKUS EXPRESS & SOCKET PAKE NEXT.JS ---
+nextApp.prepare().then(() => {
+  const app = express();
+  const PORT = process.env.PORT || 5000;
+  const server = http.createServer(app);
+  
+  const io = new Server(server, {
+    cors: {
+      origin: "*", 
+      methods: ["GET", "POST", "PUT", "DELETE"]
     }
-    socket.to(data.room).emit("receive_message", data);
   });
-});
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
+  // CORS dibebasin total karena udah jalan di 1 rumah yang sama
+  app.use(cors());
+  app.use(express.json({ limit: "10mb" })); 
 
-  console.log("--- DEBUG LOGIN ---");
-  console.log("Diterima Email:", email);
-  console.log("Diterima Password:", password);
-  console.log("Total User di DB:", USERS_DB.length);
-  console.log("User pertama di DB:", USERS_DB[0]); 
+  io.on("connection", (socket) => {
+    socket.on("join_user_global", (userId) => socket.join(userId));
+    socket.on("join_room", (room) => socket.join(room));
 
-  const user = USERS_DB.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    console.log("❌ GAGAL: User tidak cocok atau tidak ditemukan.");
-    return res.status(400).json({ message: "Salah." });
-  }
-  
-  console.log("✅ SUKSES Login:", user.email);
-  res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
-});
+    socket.on("send_message", (data) => {
+      MESSAGES_DB.push({ room: data.room, author: data.author, message: data.message, time: data.time });
+      new MessageModel({ room: data.room, author: data.author, message: data.message, time: data.time }).save().catch(console.log);
 
-app.get("/api/admin/stats", (req, res) => {
-  const tersalurkan = BARANG_DB.filter(b => b.status === "Tersalurkan").length;
-  const tersedia = BARANG_DB.length - tersalurkan;
-  res.json({ totalDonasi: tersedia, totalPengguna: USERS_DB.length, barangTersalurkan: tersalurkan, users: USERS_DB });
-});
+      const roomExist = CHATS_DB.find(c => c.room === data.room);
+      if (roomExist) {
+        roomExist.lastMessage = data.message;
+        roomExist.time = data.time;
+        ChatModel.updateOne({ room: data.room }, { lastMessage: data.message, time: data.time }).catch(console.log);
 
-app.get("/api/admin/transaksi", (req, res) => res.json(TRANSACTIONS_DB));
+        io.to(roomExist.donaturId).emit("refresh_sidebar");
+        io.to(roomExist.peminatId).emit("refresh_sidebar");
+        
+        const targetId = data.author === roomExist.donaturNama ? roomExist.peminatId : roomExist.donaturId;
+        const notifData = { _id: Date.now(), userId: targetId, pesan: `💬 Pesan baru dari ${data.author}: ${data.message}`, dibaca: false };
+        
+        NOTIF_DB.push(notifData);
+        new NotifModel(notifData).save().catch(console.log); 
 
-app.get("/api/barang", (req, res) => res.json(BARANG_DB));
+        io.to(targetId).emit("notification", { message: `Ada pesan baru dari ${data.author}!` });
+      }
+      socket.to(data.room).emit("receive_message", data);
+    });
+  });
 
-
-app.put("/api/barang/:id/selesai", (req, res) => {
-  const b = BARANG_DB.find(x => x._id === req.params.id);
-  if (b) {
-    b.status = "Tersalurkan";
-    BarangModel.updateOne({ _id: req.params.id }, { status: "Tersalurkan" }).catch(console.log);
-    res.json({ message: "Selesai" });
-  } else res.status(404).json({ message: "Barang tidak ditemukan" });
-});
-
-app.delete("/api/barang/:id", (req, res) => {
-  const index = BARANG_DB.findIndex(b => b._id === req.params.id);
-  if (index !== -1) {
-    BARANG_DB.splice(index, 1);
-    BarangModel.deleteOne({ _id: req.params.id }).catch(console.log);
-    res.json({ message: "Barang berhasil dihapus" });
-  } else res.status(404).json({ message: "Barang tidak ditemukan" });
-});
-
-
-app.get("/api/chat/rooms/:userId", (req, res) => res.json(CHATS_DB.filter(c => c.donaturId === req.params.userId || c.peminatId === req.params.userId)));
-app.get("/api/chat/messages/:room", (req, res) => res.json(MESSAGES_DB.filter(m => m.room === req.params.room)));
-
-app.get("/api/notif/:userId", (req, res) => res.json(NOTIF_DB.filter(n => n.userId === req.params.userId)));
-
-app.put("/api/notif/baca/:userId", (req, res) => {
-  NOTIF_DB.filter(n => n.userId === req.params.userId).forEach(n => n.dibaca = true);
-  NotifModel.updateMany({ userId: req.params.userId }, { dibaca: true }).catch(console.log);
-  res.json({ message: "Dibaca" });
-});
-
-
-app.put("/api/transaksi/update", (req, res) => {
-  const { txId, status, tracking, peminatId } = req.body;
-  const tx = TRANSACTIONS_DB.find(t => t._id === txId);
-  if (tx) {
-    tx.status = status; tx.tracking = tracking;
-    TransaksiModel.updateOne({ _id: txId }, { status, tracking }).catch(console.log); 
-
-    const notif = { _id: Date.now(), userId: peminatId, pesan: `📍 Update ${tx.barangNama}: ${status}`, dibaca: false };
-    NOTIF_DB.push(notif);
-    new NotifModel(notif).save().catch(console.log); 
-
-    io.to(peminatId).emit("notification", { message: `Tracking barang diupdate!` });
-    io.to(peminatId).emit("refresh_notif");
-    res.json({ message: "Update sukses" });
-  } else res.status(404).json({ message: "Gagal" });
-});
-
-app.get("/api/transaksi/:userId", (req, res) => res.json(TRANSACTIONS_DB.filter(t => t.peminatId === req.params.userId || t.donaturId === req.params.userId)));
-
-app.put("/api/transaksi/request-cancel", (req, res) => {
-  const { txId, alasan, peminatId, donaturId } = req.body;
-  const tx = TRANSACTIONS_DB.find(t => t._id === txId);
-  if (tx) {
-    tx.status = "Menunggu Konfirmasi Batal";
-    tx.tracking = `Penerima meminta pembatalan: ${alasan}`;
-    TransaksiModel.updateOne({ _id: txId }, { status: tx.status, tracking: tx.tracking }).catch(console.log);
+  app.post("/api/auth/login", (req, res) => {
+    const { email, password } = req.body;
+    console.log("--- DEBUG LOGIN ---");
+    console.log("Diterima Email:", email);
+    console.log("Diterima Password:", password);
     
-    const notif = { _id: Date.now(), userId: donaturId, pesan: `⚠️ Penerima meminta pembatalan untuk "${tx.barangNama}": ${alasan}`, dibaca: false };
-    NOTIF_DB.push(notif);
-    new NotifModel(notif).save().catch(console.log);
+    const user = USERS_DB.find((u) => u.email === email && u.password === password);
+    if (!user) {
+      console.log("❌ GAGAL: User tidak cocok.");
+      return res.status(400).json({ message: "Salah." });
+    }
+    console.log("✅ SUKSES Login:", user.email);
+    res.json({ _id: user._id, nama: user.nama, role: user.role, token: "mock_jwt_token" });
+  });
 
-    io.to(donaturId).emit("notification", { message: `Ada permintaan pembatalan dari Penerima!` });
-    io.to(donaturId).emit("refresh_notif");
-    
-    res.json({ message: "Permintaan pembatalan dikirim" });
-  } else res.status(404).json({ message: "Gagal" });
-});
+  app.get("/api/admin/stats", (req, res) => {
+    const tersalurkan = BARANG_DB.filter(b => b.status === "Tersalurkan").length;
+    const tersedia = BARANG_DB.length - tersalurkan;
+    res.json({ totalDonasi: tersedia, totalPengguna: USERS_DB.length, barangTersalurkan: tersalurkan, users: USERS_DB });
+  });
 
-app.put("/api/transaksi/confirm-cancel", (req, res) => {
-  const { txId, disetujui, donaturId, peminatId } = req.body;
-  const tx = TRANSACTIONS_DB.find(t => t._id === txId);
-  if (tx) {
-    if (disetujui) {
-      tx.status = "Dibatalkan";
-      tx.tracking = "Transaksi dibatalkan (Disetujui Donatur)";
-      const notif = { _id: Date.now(), userId: peminatId, pesan: `❌ Pembatalan "${tx.barangNama}" disetujui Donatur.`, dibaca: false };
+  app.get("/api/admin/transaksi", (req, res) => res.json(TRANSACTIONS_DB));
+  app.get("/api/barang", (req, res) => res.json(BARANG_DB));
+
+  app.put("/api/barang/:id/selesai", (req, res) => {
+    const b = BARANG_DB.find(x => x._id === req.params.id);
+    if (b) {
+      b.status = "Tersalurkan";
+      BarangModel.updateOne({ _id: req.params.id }, { status: "Tersalurkan" }).catch(console.log);
+      res.json({ message: "Selesai" });
+    } else res.status(404).json({ message: "Barang tidak ditemukan" });
+  });
+
+  app.delete("/api/barang/:id", (req, res) => {
+    const index = BARANG_DB.findIndex(b => b._id === req.params.id);
+    if (index !== -1) {
+      BARANG_DB.splice(index, 1);
+      BarangModel.deleteOne({ _id: req.params.id }).catch(console.log);
+      res.json({ message: "Barang berhasil dihapus" });
+    } else res.status(404).json({ message: "Barang tidak ditemukan" });
+  });
+
+  app.get("/api/chat/rooms/:userId", (req, res) => res.json(CHATS_DB.filter(c => c.donaturId === req.params.userId || c.peminatId === req.params.userId)));
+  app.get("/api/chat/messages/:room", (req, res) => res.json(MESSAGES_DB.filter(m => m.room === req.params.room)));
+  app.get("/api/notif/:userId", (req, res) => res.json(NOTIF_DB.filter(n => n.userId === req.params.userId)));
+
+  app.put("/api/notif/baca/:userId", (req, res) => {
+    NOTIF_DB.filter(n => n.userId === req.params.userId).forEach(n => n.dibaca = true);
+    NotifModel.updateMany({ userId: req.params.userId }, { dibaca: true }).catch(console.log);
+    res.json({ message: "Dibaca" });
+  });
+
+  app.put("/api/transaksi/update", (req, res) => {
+    const { txId, status, tracking, peminatId } = req.body;
+    const tx = TRANSACTIONS_DB.find(t => t._id === txId);
+    if (tx) {
+      tx.status = status; tx.tracking = tracking;
+      TransaksiModel.updateOne({ _id: txId }, { status, tracking }).catch(console.log); 
+      const notif = { _id: Date.now(), userId: peminatId, pesan: `📍 Update ${tx.barangNama}: ${status}`, dibaca: false };
+      NOTIF_DB.push(notif);
+      new NotifModel(notif).save().catch(console.log); 
+      io.to(peminatId).emit("notification", { message: `Tracking barang diupdate!` });
+      io.to(peminatId).emit("refresh_notif");
+      res.json({ message: "Update sukses" });
+    } else res.status(404).json({ message: "Gagal" });
+  });
+
+  app.get("/api/transaksi/:userId", (req, res) => res.json(TRANSACTIONS_DB.filter(t => t.peminatId === req.params.userId || t.donaturId === req.params.userId)));
+
+  app.put("/api/transaksi/request-cancel", (req, res) => {
+    const { txId, alasan, peminatId, donaturId } = req.body;
+    const tx = TRANSACTIONS_DB.find(t => t._id === txId);
+    if (tx) {
+      tx.status = "Menunggu Konfirmasi Batal";
+      tx.tracking = `Penerima meminta pembatalan: ${alasan}`;
+      TransaksiModel.updateOne({ _id: txId }, { status: tx.status, tracking: tx.tracking }).catch(console.log);
+      const notif = { _id: Date.now(), userId: donaturId, pesan: `⚠️ Penerima meminta pembatalan untuk "${tx.barangNama}": ${alasan}`, dibaca: false };
       NOTIF_DB.push(notif);
       new NotifModel(notif).save().catch(console.log);
-    } else {
-      tx.status = "Disetujui";
-      tx.tracking = "Permintaan pembatalan ditolak. Transaksi dilanjutkan.";
-      const notif = { _id: Date.now(), userId: peminatId, pesan: `✅ Pembatalan "${tx.barangNama}" ditolak Donatur. Transaksi dilanjutkan.`, dibaca: false };
-      NOTIF_DB.push(notif);
-      new NotifModel(notif).save().catch(console.log);
+      io.to(donaturId).emit("notification", { message: `Ada permintaan pembatalan dari Penerima!` });
+      io.to(donaturId).emit("refresh_notif");
+      res.json({ message: "Permintaan pembatalan dikirim" });
+    } else res.status(404).json({ message: "Gagal" });
+  });
+
+  app.put("/api/transaksi/confirm-cancel", (req, res) => {
+    const { txId, disetujui, donaturId, peminatId } = req.body;
+    const tx = TRANSACTIONS_DB.find(t => t._id === txId);
+    if (tx) {
+      if (disetujui) {
+        tx.status = "Dibatalkan";
+        tx.tracking = "Transaksi dibatalkan (Disetujui Donatur)";
+        const notif = { _id: Date.now(), userId: peminatId, pesan: `❌ Pembatalan "${tx.barangNama}" disetujui Donatur.`, dibaca: false };
+        NOTIF_DB.push(notif);
+        new NotifModel(notif).save().catch(console.log);
+      } else {
+        tx.status = "Disetujui";
+        tx.tracking = "Permintaan pembatalan ditolak. Transaksi dilanjutkan.";
+        const notif = { _id: Date.now(), userId: peminatId, pesan: `✅ Pembatalan "${tx.barangNama}" ditolak Donatur. Transaksi dilanjutkan.`, dibaca: false };
+        NOTIF_DB.push(notif);
+        new NotifModel(notif).save().catch(console.log);
+      }
+      TransaksiModel.updateOne({ _id: txId }, { status: tx.status, tracking: tx.tracking }).catch(console.log);
+      io.to(peminatId).emit("notification", { message: `Status pembatalan diupdate oleh Donatur!` });
+      io.to(peminatId).emit("refresh_notif");
+      res.json({ message: "Konfirmasi sukses" });
+    } else res.status(404).json({ message: "Gagal" });
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { nama, email, password } = req.body;
+      const existingUser = USERS_DB.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) return res.status(400).json({ message: "Email sudah terdaftar" });
+
+      const newUser = { _id: `user_${Date.now()}`, nama, email, password, role: "Penerima" };
+      USERS_DB.push(newUser);
+      await new UserModel(newUser).save();
+      res.status(201).json({ message: "Registrasi berhasil" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
     }
-    TransaksiModel.updateOne({ _id: txId }, { status: tx.status, tracking: tx.tracking }).catch(console.log);
-    
-    io.to(peminatId).emit("notification", { message: `Status pembatalan diupdate oleh Donatur!` });
-    io.to(peminatId).emit("refresh_notif");
-    res.json({ message: "Konfirmasi sukses" });
-  } else res.status(404).json({ message: "Gagal" });
-});
+  });
 
-app.post("/api/auth/register", async (req, res) => {
-  try {
-    const { nama, email, password } = req.body;
+  // --- 3. JALUR FALLBACK (WAJIB DI BAWAH SEMUA API) ---
+  app.all("*", (req, res) => {
+    return nextHandler(req, res);
+  });
 
-    const existingUser = USERS_DB.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (existingUser) {
-      return res.status(400).json({
-        message: "Email sudah terdaftar"
-      });
-    }
-
-    const newUser = {
-      _id: `user_${Date.now()}`,
-      nama,
-      email,
-      password,
-      role: "Penerima"
-    };
-
-    USERS_DB.push(newUser);
-
-    await new UserModel(newUser).save();
-
-    res.status(201).json({
-      message: "Registrasi berhasil"
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error"
-    });
-  }
-});
-
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`==========================================`);
-  console.log(`🚀 SERVER TRANSAKSI & ADMIN JALAN DI PORT ${PORT}`);
-  console.log(`==========================================`);
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`==========================================`);
+    console.log(`🚀 MONOLITH SERVER JALAN DI PORT ${PORT}`);
+    console.log(`==========================================`);
+  });
 });

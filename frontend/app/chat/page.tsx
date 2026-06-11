@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { io } from "socket.io-client";
 
-const socket = io("https://projectuassoftdev-production.up.railway.app");
+const socket = io("");
 
 function ChatContent() {
   const searchParams = useSearchParams();
@@ -22,7 +22,7 @@ function ChatContent() {
   const [currentMessage, setCurrentMessage] = useState("");
 
   const fetchRooms = (userId: string) => {
-    fetch(`https://projectuassoftdev-production.up.railway.app${userId}`)
+    fetch(`${userId}`)
       .then(res => res.json())
       .then(data => setChatRooms(data));
   };
@@ -46,7 +46,7 @@ function ChatContent() {
       setActiveBarangName(urlBarang || "Barang");
     }
 
-    fetch(`https://projectuassoftdev-production.up.railway.app${parsedUser._id}`)
+    fetch(`${parsedUser._id}`)
       .then(res => res.json())
       .then(data => {
         setChatRooms(data);
@@ -69,7 +69,7 @@ function ChatContent() {
 
     socket.emit("join_room", activeRoom);
 
-    fetch(`https://projectuassoftdev-production.up.railway.app${activeRoom}`)
+    fetch(``)
       .then(res => res.json())
       .then(data => setMessageList(data));
 

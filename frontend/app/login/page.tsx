@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("https://projectuassoftdev-production.up.railway.app", {
+      const res = await fetch("", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

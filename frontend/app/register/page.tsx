@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API = "https://projectuassoftdev-production.up.railway.app";
+const API = "";
 
 export default function RegisterPage() {
   const [nama, setNama] = useState("");

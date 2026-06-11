@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API = "https://projectuassoftdev-production.up.railway.app";
+const API = "";
 
 function Navbar({ user, onLogout }: any) {
   return (
