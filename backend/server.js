@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 dotenv.config();
-const app = express();
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!"))
