@@ -118,6 +118,52 @@ loadDataDariMongo();
   app.get("/api/admin/transaksi", (req, res) => res.json(TRANSACTIONS_DB));
   app.get("/api/barang", (req, res) => res.json(BARANG_DB));
 
+  app.post("/api/barang", async (req, res) => {
+  try {
+    const {
+      namaBarang,
+      kategori,
+      deskripsi,
+      stok,
+      kondisi,
+      foto,
+      donaturNama,
+      donaturId
+    } = req.body;
+
+    const barangBaru = {
+      _id: `barang_${Date.now()}`,
+      namaBarang,
+      kategori,
+      deskripsi,
+      stok,
+      kondisi,
+      foto,
+      status: "Tersedia",
+      tanggalUpload: new Date().toLocaleDateString(),
+      donatur: {
+        _id: donaturId,
+        nama: donaturNama
+      }
+    };
+
+    BARANG_DB.push(barangBaru);
+
+    await new BarangModel(barangBaru).save();
+
+    res.status(201).json({
+      message: "Barang berhasil ditambahkan",
+      barang: barangBaru
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Gagal menyimpan barang"
+    });
+  }
+});
+
   app.put("/api/barang/:id/selesai", (req, res) => {
     const b = BARANG_DB.find(x => x._id === req.params.id);
     if (b) {
