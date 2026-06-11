@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API = "";
+const API = "exquisite-acceptance-production-3bb9.up.railway.app";
 
 export default function RegisterPage() {
   const [nama, setNama] = useState("");
@@ -14,27 +14,37 @@ export default function RegisterPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
 
- const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    try {
-      const response = await fetch(`${API}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", 
-        body: JSON.stringify({ nama, email, password, role: "Donatur" }), 
-      });
+ const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
 
-      if (response.ok) {
-        setShowSuccess(true);
-      } else {
-        const data = await response.json();
-        setError(data.message || "Gagal melakukan registrasi.");
-      }
-    } catch {
-      setError("Terjadi kesalahan jaringan.");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  try {
+    const response = await fetch(`${API}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nama,
+        email,
+        password,
+        role: "Donatur"
+      })
+    });
+
+    if (response.ok) {
+      setShowSuccess(true);
+    } else {
+      const data = await response.json();
+      setError(data.message || "Gagal melakukan registrasi.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError("Terjadi kesalahan jaringan.");
+  }
+};
 
   return (
     <div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">

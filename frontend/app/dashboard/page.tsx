@@ -4,9 +4,11 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { io } from "socket.io-client";
-const socket = io("");
 
-const API = "";
+const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
+const socket = io(API, {
+  transports: ["websocket", "polling"],
+});
 
 function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) {
   const unread = notifs?.filter((n: any) => !n.dibaca).length || 0;
