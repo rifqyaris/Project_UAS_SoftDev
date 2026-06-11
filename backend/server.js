@@ -4,14 +4,9 @@ import http from "http";
 import { Server } from "socket.io"; 
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import next from 'next';
 
 dotenv.config();
-
-// --- 1. SETUP NEXT.JS ---
-const dev = process.env.NODE_ENV !== "production";
-const nextApp = next({ dev });
-const nextHandler = nextApp.getRequestHandler();
+const app = express();
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!"))
@@ -228,17 +223,6 @@ nextApp.prepare().then(() => {
       res.status(500).json({ message: "Server error" });
     }
   });
-
-app.use((req, res, next) => {
-  if (req.url.startsWith('/api')) {
-    return next(); 
-  }
-  next();
-});
-
-app.all("*", (req, res) => {
-  return nextHandler(req, res);
-});
 
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`==========================================`);
