@@ -230,8 +230,8 @@ nextApp.prepare().then(() => {
   });
 
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    return next(); // Jangan masuk ke Next.js kalau depannya /api/
+  if (req.url.startsWith('/api')) {
+    return next(); 
   }
   next();
 });
@@ -239,10 +239,6 @@ app.use((req, res, next) => {
 app.all("*", (req, res) => {
   return nextHandler(req, res);
 });
-
-  app.all("*", (req, res) => {
-    return nextHandler(req, res);
-  });
 
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`==========================================`);
