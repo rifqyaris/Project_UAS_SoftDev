@@ -213,6 +213,7 @@ nextApp.prepare().then(() => {
   });
 
   app.post("/api/auth/register", async (req, res) => {
+    console.log("🔥 ADA REQUEST MASUK KE REGISTER!");
     try {
       const { nama, email, password } = req.body;
       const existingUser = USERS_DB.find((u) => u.email.toLowerCase() === email.toLowerCase());
@@ -228,7 +229,17 @@ nextApp.prepare().then(() => {
     }
   });
 
-  // --- 3. JALUR FALLBACK (WAJIB DI BAWAH SEMUA API) ---
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next(); // Jangan masuk ke Next.js kalau depannya /api/
+  }
+  next();
+});
+
+app.all("*", (req, res) => {
+  return nextHandler(req, res);
+});
+
   app.all("*", (req, res) => {
     return nextHandler(req, res);
   });
