@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { io } from "socket.io-client";
 
-const socket = io("");
+const socket = io("https://exquisite-acceptance-production-3bb9.up.railway.app");
 
 function ChatContent() {
   const searchParams = useSearchParams();
@@ -22,10 +22,12 @@ function ChatContent() {
   const [currentMessage, setCurrentMessage] = useState("");
 
   const fetchRooms = (userId: string) => {
-    fetch(`${userId}`)
-      .then(res => res.json())
-      .then(data => setChatRooms(data));
-  };
+  fetch(
+    `https://exquisite-acceptance-production-3bb9.up.railway.app/api/chat/rooms/${userId}`
+  )
+    .then((res) => res.json())
+    .then((data) => setChatRooms(data));
+};
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -46,7 +48,7 @@ function ChatContent() {
       setActiveBarangName(urlBarang || "Barang");
     }
 
-    fetch(`${parsedUser._id}`)
+    fetch( `https://exquisite-acceptance-production-3bb9.up.railway.app/api/chat/rooms/${parsedUser._id}`)
       .then(res => res.json())
       .then(data => {
         setChatRooms(data);
@@ -69,9 +71,11 @@ function ChatContent() {
 
     socket.emit("join_room", activeRoom);
 
-    fetch(``)
-      .then(res => res.json())
-      .then(data => setMessageList(data));
+  fetch(
+    `https://exquisite-acceptance-production-3bb9.up.railway.app/api/chat/messages/${activeRoom}`
+  )
+    .then((res) => res.json())
+    .then((data) => setMessageList(data));
 
     const handleReceive = (data: any) => {
       if (data.room === activeRoom) {

@@ -266,6 +266,93 @@ loadDataDariMongo();
     }
   });
 
+  app.post("/api/transaksi/request", async (req, res) => {
+  try {
+    const data = {
+      _id: `tx_${Date.now()}`,
+      ...req.body,
+      status: "Menunggu Konfirmasi",
+      tracking: "Permintaan sedang menunggu konfirmasi Donatur"
+    };
+
+    TRANSACTIONS_DB.push(data);
+
+    await new TransaksiModel(data).save();
+
+    const notif = {
+      _id: Date.now(),
+      userId: data.donaturId,
+      pesan: `📦 Ada permintaan barang untuk: ${data.barangNama}`,
+      dibaca: false
+    };
+
+    NOTIF_DB.push(notif);
+    await new NotifModel(notif).save();
+
+    io.to(data.donaturId).emit("notification", {
+      message: `Ada permintaan baru untuk ${data.barangNama}`
+    });
+
+    io.to(data.donaturId).emit("refresh_notif");
+
+    res.status(201).json({
+      message: "Permintaan berhasil"
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+});
+
+app.post("/api/chat/init", async (req, res) => {
+  try {
+    const {
+      room,
+      barangId,
+      barangNama,
+      donaturId,
+      donaturNama,
+      peminatId,
+      peminatNama
+    } = req.body;
+
+    const exist = CHATS_DB.find(c => c.room === room);
+
+    if (!exist) {
+
+      const chatBaru = {
+        room,
+        barangId,
+        barangNama,
+        donaturId,
+        donaturNama,
+        peminatId,
+        peminatNama,
+        lastMessage: "",
+        time: ""
+      };
+
+      CHATS_DB.push(chatBaru);
+
+      await new ChatModel(chatBaru).save();
+    }
+
+    res.json({
+      message: "Chat dibuat"
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message: "Gagal"
+    });
+  }
+});
+
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`==========================================`);
     console.log(`🚀 MONOLITH SERVER JALAN DI PORT ${PORT}`);
