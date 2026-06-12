@@ -250,21 +250,44 @@ loadDataDariMongo();
   });
 
   app.post("/api/auth/register", async (req, res) => {
-    console.log("🔥 ADA REQUEST MASUK KE REGISTER!");
-    try {
-      const { nama, email, password } = req.body;
-      const existingUser = USERS_DB.find((u) => u.email.toLowerCase() === email.toLowerCase());
-      if (existingUser) return res.status(400).json({ message: "Email sudah terdaftar" });
+  console.log("🔥 ADA REQUEST MASUK KE REGISTER!");
+  try {
+    const { nama, email, password } = req.body;
 
-      const newUser = { _id: `user_${Date.now()}`, nama, email, password, role: "Penerima" };
-      USERS_DB.push(newUser);
-      await new UserModel(newUser).save();
-      res.status(201).json({ message: "Registrasi berhasil" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
+    const existingUser = USERS_DB.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (existingUser)
+      return res.status(400).json({
+        message: "Email sudah terdaftar",
+      });
+
+    const newUser = {
+      _id: `user_${Date.now()}`,
+      nama,
+      email,
+      password,
+      role: "Penerima",
+    };
+
+    USERS_DB.push(newUser);
+
+    await new UserModel(newUser).save();
+
+    console.log("USER BERHASIL DISIMPAN:", newUser);
+
+    res.status(201).json({
+      message: "Registrasi berhasil",
+    });
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 
   app.post("/api/transaksi/request", async (req, res) => {
   try {
