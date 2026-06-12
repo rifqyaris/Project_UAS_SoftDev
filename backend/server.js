@@ -8,8 +8,13 @@ import mongoose from 'mongoose';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!"))
-  .catch((err) => console.error("❌ GAGAL KONEKSI MONGODB:", err));
+  .then(() => {
+    console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!");
+    console.log("DATABASE:", mongoose.connection.name);
+  })
+  .catch((err) => {
+    console.error("❌ GAGAL KONEKSI MONGODB:", err);
+  });
 
 const BarangModel = mongoose.model("Barang", new mongoose.Schema({ _id: String }, { strict: false }));
 const TransaksiModel = mongoose.model("Transaksi", new mongoose.Schema({ _id: String }, { strict: false }));
