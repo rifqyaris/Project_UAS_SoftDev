@@ -6,11 +6,18 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 dotenv.config();
+mongoose.set("bufferCommands", false);
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ BERHASIL TERHUBUNG KE MONGODB ATLAS CLOUD!");
-    console.log("DATABASE:", mongoose.connection.name);
+  .then(async () => {
+    console.log("✅ BERHASIL TERHUBUNG KE MONGODB");
+    console.log("Database:", mongoose.connection.name);
+
+    await loadDataDariMongo();
+
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 MONOLITH SERVER JALAN DI PORT ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error("❌ GAGAL KONEKSI MONGODB:", err);
