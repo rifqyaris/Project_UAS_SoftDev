@@ -163,18 +163,16 @@ export default function AdminPage() {
                     <th className="px-4 py-3 fw-semibold">ID User</th>
                     <th className="px-4 py-3 fw-semibold">Nama Pengguna</th>
                     <th className="px-4 py-3 fw-semibold">Email</th>
-                    <th className="px-4 py-3 fw-semibold">Peran</th>
                   </tr>
                 </thead>
                 <tbody className="small">
-                  {stats.users.map((u: any) => (
+                   {stats.users.map((u: any) => (
                     <tr key={u._id}>
                       <td className="px-4 py-3 text-secondary">{u._id}</td>
                       <td className="px-4 py-3 fw-bold text-dark">{u.nama}</td>
                       <td className="px-4 py-3 text-muted">{u.email}</td>
-                      <td className="px-4 py-3"><span className={`badge ${u.role === 'Admin' ? 'bg-danger' : 'bg-success'} px-3 py-1 rounded-pill`}>{u.role}</span></td>
-                    </tr>
-                  ))}
+                     </tr>
+                   ))}
                 </tbody>
               </table>
             </div>
