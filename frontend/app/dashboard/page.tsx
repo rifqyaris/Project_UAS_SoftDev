@@ -399,6 +399,7 @@ export default function DashboardPage() {
                           <tr><td className="text-muted w-35 p-0 pb-1">📦 Donatur</td><td className="fw-bold p-0 pb-1">: {selectedItem.donatur?.nama} {isMyItem && "(Anda)"}</td></tr>
                           <tr><td className="text-muted p-0 pb-1">🛠 Kondisi</td><td className="fw-bold p-0 pb-1">: {selectedItem.kondisi || "Baik"}</td></tr>
                           <tr><td className="text-muted p-0 pb-1">📅 Diunggah</td><td className="fw-bold p-0 pb-1">: {selectedItem.tanggalUpload || "Baru Saja"}</td></tr>
+                          <tr><td className="text-muted p-0 pb-1">📦 Jumlah Stok</td><td className="fw-bold p-0 pb-1">: {selectedItem.stok || "-"}</td></tr>
                         </tbody>
                       </table>
                     </div>
