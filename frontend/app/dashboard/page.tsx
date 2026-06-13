@@ -483,7 +483,7 @@ export default function DashboardPage() {
                   <label className="form-label text-success mb-1 small fw-bold">Lokasi Drop Point (Wajib Ambil Sendiri):</label>
                   <select className="form-select form-select-sm" value={selectedDropPoint} onChange={(e) => setSelectedDropPoint(e.target.value)}>
                     <option value="Gedung Utama Universitas Tarumanagara">Gedung Utama Untar</option>
-                    <option value="Drop Point Aula Lantai 2">Aula Lantai 2</option>
+                    <option value="Drop Point Gedung Untar 2">Gedung Untar 2</option>
                   </select>
                 </div>
                 <div className="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
