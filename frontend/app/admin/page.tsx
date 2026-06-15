@@ -132,12 +132,13 @@ export default function AdminPage() {
                       if (tx.status === "Disetujui") statusBadge = "bg-success text-white";
                       if (tx.status === "Ditolak") statusBadge = "bg-danger text-white";
                       if (tx.status === "Selesai") statusBadge = "bg-primary text-white";
+                      if (tx.status === "Dibatalkan") statusBadge = "bg-warning text-dark";
 
                       return (
                         <tr key={tx._id}>
                           <td className="px-4 py-3 text-secondary">{tx._id}</td>
                           <td className="px-4 py-3 fw-bold text-dark">{tx.barangNama}</td>
-                          <td className="px-4 py-3">{tx.donaturId?.nama}</td>
+                          <td className="px-4 py-3">{tx.donaturNama || tx.donaturId?.nama || "-"}</td>
                           <td className="px-4 py-3">{tx.peminatNama}</td>
                           <td className="px-4 py-3"><span className={`badge ${statusBadge} px-2 py-1`}>{tx.status}</span></td>
                           <td className="px-4 py-3 text-muted"><div style={{ maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis" }}>{tx.tracking}</div></td>
