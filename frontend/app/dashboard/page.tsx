@@ -375,7 +375,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* MODAL DETAIL BARANG */}
       {selectedItem && (() => {
         const isMyItem = user && selectedItem.donatur?.nama === user.nama;
         const isSold = selectedItem.status === "Tersalurkan";
@@ -463,7 +462,6 @@ export default function DashboardPage() {
         );
       })()}
 
-      {/* MODAL REQUEST BARANG */}
       {requestTarget && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)" }} role="dialog">
           <div className="modal-dialog modal-dialog-centered">
@@ -496,7 +494,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* MODAL INFO & SUCCESS & CONFIRM */}
       {infoModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.7)", zIndex: 9999 }} role="dialog">
           <div className="modal-dialog modal-dialog-centered">

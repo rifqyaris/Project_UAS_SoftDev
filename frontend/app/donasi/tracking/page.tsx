@@ -238,7 +238,6 @@ export default function TrackingPage() {
                         </>
                       )}
 
-                      {/* TOMBOL KONFIRMASI BATAL UNTUK DONATUR */}
                       {tx.status === "Menunggu Konfirmasi Batal" && !isPenerima && (
                         <div className="d-flex gap-2">
                           <button onClick={async () => {
@@ -253,7 +252,6 @@ export default function TrackingPage() {
                         </div>
                       )}
 
-                      {/* TOMBOL REQUEST BATAL UNTUK PENERIMA */}
                       {tx.status === "Disetujui" && isPenerima && (
                         <button onClick={() => {
                           setCancelPromptData(tx);
@@ -269,7 +267,6 @@ export default function TrackingPage() {
         )}
       </div>
 
-      {/* POP-UP CUSTOM UNTUK ALASAN BATAL */}
       {cancelPromptData && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 9999 }} role="dialog">
           <div className="modal-dialog modal-dialog-centered">
@@ -298,7 +295,6 @@ export default function TrackingPage() {
         </div>
       )}
 
-      {/* MODAL NOTIFIKASI & INFO LAINNYA */}
       {infoModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.7)", zIndex: 9999 }} role="dialog">
            <div className="modal-dialog modal-dialog-centered"><div className="modal-content p-4 text-center">

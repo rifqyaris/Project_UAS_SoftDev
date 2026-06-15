@@ -123,7 +123,6 @@ function ChatContent() {
       <div className="container bg-white rounded-4 shadow-sm overflow-hidden p-0 border" style={{ height: "85vh" }}>
         <div className="row g-0 h-100">
           
-          {/* SIDEBAR KIRI */}
           <div className="col-md-4 border-end h-100 d-flex flex-column bg-white">
             <div className="p-3 border-bottom bg-success text-white d-flex justify-content-between align-items-center">
               <h5 className="fw-bold m-0">💬 Daftar Pesan</h5>
@@ -164,7 +163,6 @@ function ChatContent() {
             </div>
           </div>
 
-          {/* AREA CHAT KANAN */}
           <div className="col-md-8 h-100 d-flex flex-column bg-light">
             {activeRoom ? (
               <>

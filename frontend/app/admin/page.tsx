@@ -23,7 +23,6 @@ function Navbar({ user, onLogout }: any) {
           <div className="d-flex align-items-center gap-2">
             {user && (
               <>
-                {/* BAGIAN ROLE DI SAMPING NAMA SUDAH DIHAPUS */}
                 <span className="text-white bg-white bg-opacity-25 px-3 py-1 rounded-pill small">
                   👤 <strong>{user.nama}</strong>
                 </span>
@@ -71,6 +70,12 @@ export default function AdminPage() {
   }, [router]);
 
   const handleLogout = () => { localStorage.clear(); router.push("/"); };
+
+  const getUserName = (userId: string) => {
+    if (!userId) return "-";
+    const foundUser = stats.users.find((u: any) => u._id === userId);
+    return foundUser ? foundUser.nama : userId;
+  };
 
   return (
     <div className="bg-light min-vh-100 pb-5">
@@ -138,8 +143,8 @@ export default function AdminPage() {
                         <tr key={tx._id}>
                           <td className="px-4 py-3 text-secondary">{tx._id}</td>
                           <td className="px-4 py-3 fw-bold text-dark">{tx.barangNama}</td>
-                          <td className="px-4 py-3">{tx.donaturNama}</td>
-                          <td className="px-4 py-3">{tx.peminatNama}</td>
+                          <td className="px-4 py-3">{tx.donaturNama || getUserName(tx.donaturId)}</td>
+                          <td className="px-4 py-3">{tx.peminatNama || getUserName(tx.peminatId)}</td>
                           <td className="px-4 py-3"><span className={`badge ${statusBadge} px-2 py-1`}>{tx.status}</span></td>
                           <td className="px-4 py-3 text-muted"><div style={{ maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis" }}>{tx.tracking}</div></td>
                         </tr>
