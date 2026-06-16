@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
 
+// Komponen Navbar khusus Admin
 function Navbar({ user, onLogout }: any) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-success shadow-sm py-2">
@@ -37,11 +38,12 @@ function Navbar({ user, onLogout }: any) {
 }
 
 export default function AdminPage() {
-  const [user, setUser] = useState<any>(null);
-  const [stats, setStats] = useState<any>({ totalDonasi: 0, totalPengguna: 0, barangTersalurkan: 0, users: [] });
-  const [allTransactions, setAllTransactions] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null); // Menyimpan data akun admin yang sedang login
+  const [stats, setStats] = useState<any>({ totalDonasi: 0, totalPengguna: 0, barangTersalurkan: 0, users: [] }); // Menyimpan statistik platform
+  const [allTransactions, setAllTransactions] = useState<any[]>([]); // Menyimpan seluruh transaksi yang terjadi di platform
   const router = useRouter();
 
+  // Memastikan hanya Admin yang dapat mengakses halaman ini
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -69,8 +71,10 @@ export default function AdminPage() {
     fetchData();
   }, [router]);
 
+  // Menghapus sesi login dan kembali ke halaman utama
   const handleLogout = () => { localStorage.clear(); router.push("/"); };
 
+  // Mengubah User ID menjadi nama pengguna yang lebih mudah dibaca
   const getUserName = (userId: string) => {
     if (!userId) return "-";
     const foundUser = stats.users.find((u: any) => u._id === userId);
