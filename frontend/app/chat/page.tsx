@@ -210,7 +210,7 @@ function ChatContent() {
               <div className="my-auto text-center text-muted">
                 <span style={{ fontSize: "60px" }}>💬</span>
                 <h5 className="mt-3 fw-bold">Selamat Datang di Obrolan DonasiKu</h5>
-                <p className="small px-4">Pilih salah satu daftar nama obrolan di sebelah kiri untuk mulai berdiskusi tentang penyerahan donasi barang.</p>
+                <p className="small px-4">Pilih salah satu daftar nama obrolan di sebelah kiri untuk memulai percakapan.</p>
               </div>
             )}
           </div>
