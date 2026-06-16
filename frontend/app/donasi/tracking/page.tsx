@@ -75,17 +75,25 @@ function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) 
 }
 
 export default function TrackingPage() {
-  const [user, setUser] = useState<any>(null);
-  const [notifs, setNotifs] = useState<any[]>([]);
-  const [transaksiList, setTransaksiList] = useState<any[]>([]);
+// Menyimpan data user yang sedang login
+const [user, setUser] = useState<any>(null);
+// Menyimpan daftar notifikasi
+const [notifs, setNotifs] = useState<any[]>([]);
+// Menyimpan daftar transaksi tracking
+const [transaksiList, setTransaksiList] = useState<any[]>([]);
   
-  const [infoModal, setInfoModal] = useState(""); 
-  const [successModal, setSuccessModal] = useState("");
-  const [errorModal, setErrorModal] = useState("");
+// Modal informasi notifikasi
+const [infoModal, setInfoModal] = useState("");
+// Modal sukses
+const [successModal, setSuccessModal] = useState("");
+// Modal error
+const [errorModal, setErrorModal] = useState("");
   
-  const [cancelPromptData, setCancelPromptData] = useState<any>(null);
-  const [cancelReasonInput, setCancelReasonInput] = useState("");
-
+// Menyimpan transaksi yang akan dibatalkan
+const [cancelPromptData, setCancelPromptData] = useState<any>(null);
+// Menyimpan alasan pembatalan transaksi
+const [cancelReasonInput, setCancelReasonInput] = useState("");
+  
   const router = useRouter();
 
   const loadData = useCallback(async (token: string, storedUser: any) => {
