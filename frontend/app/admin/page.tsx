@@ -37,7 +37,7 @@ function Navbar({ user, onLogout }: any) {
   );
 }
 
-export default function AdminPage() {
+export default function AdminPage() { // Halaman Dashboard Admin sebagai pusat monitoring sistem
   const [user, setUser] = useState<any>(null); // Menyimpan data akun admin yang sedang login
   const [stats, setStats] = useState<any>({ totalDonasi: 0, totalPengguna: 0, barangTersalurkan: 0, users: [] }); // Menyimpan statistik platform
   const [allTransactions, setAllTransactions] = useState<any[]>([]); // Menyimpan seluruh transaksi yang terjadi di platform
@@ -176,7 +176,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="small">
-                   {stats.users.map((u: any) => (
+                   {stats.users.map((u: any) => ( // Menampilkan seluruh akun yang terdaftar pada platform
                     <tr key={u._id}>
                       <td className="px-4 py-3 text-secondary">{u._id}</td>
                       <td className="px-4 py-3 fw-bold text-dark">{u.nama}</td>
