@@ -96,12 +96,12 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
   
   const router = useRouter();
 
-  const loadData = useCallback(async (token: string, storedUser: any) => {
+  const loadData = useCallback(async (token: string, storedUser: any) => { // Mengambil data notifikasi dan transaksi dari server
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const notifRes = await fetch(`${API}/api/notif/${storedUser._id}`, { headers });
+      const notifRes = await fetch(`${API}/api/notif/${storedUser._id}`, { headers }); // Request daftar notifikasi pengguna
       if (notifRes.ok) setNotifs(await notifRes.json());
-      const txRes = await fetch(`${API}/api/transaksi/${storedUser._id}`, { headers });
+      const txRes = await fetch(`${API}/api/transaksi/${storedUser._id}`, { headers }); // Request daftar transaksi pengguna
       if (txRes.ok) {
         const data = await txRes.json();
         setTransaksiList(data.reverse());
