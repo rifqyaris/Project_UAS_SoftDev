@@ -13,10 +13,6 @@ export default function LandingPage() {
           </a>
           <div className="d-flex gap-3 ms-auto">
             
-            <a href="/dashboard" className="btn btn-warning rounded-pill px-4 fw-bold shadow-sm text-dark text-decoration-none">
-              🚀 Ke Dashboard
-            </a>
-
             <a href="/login" className="btn btn-outline-light rounded-pill px-4 fw-semibold text-decoration-none">
               Masuk
             </a>
