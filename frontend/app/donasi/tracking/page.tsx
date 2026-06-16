@@ -7,12 +7,12 @@ import Link from "next/link";
 import { io } from "socket.io-client";
 
 const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
-const socket = io(API);
+const socket = io(API); // Membuat koneksi socket ke server
 
 // Komponen Navbar yang digunakan pada halaman tracking
 function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) {
-  const unread = notifs?.filter((n: any) => !n.dibaca).length || 0;
-  const markRead = async () => {
+  const unread = notifs?.filter((n: any) => !n.dibaca).length || 0; // Menghitung jumlah notifikasi yang belum dibaca
+  const markRead = async () => { // Mengubah seluruh notifikasi pengguna menjadi status dibaca
     const token = localStorage.getItem("token");
     if (token && user) {
       await fetch(`${API}/api/notif/baca/${user._id}`, { method: "PUT", headers: { Authorization: `Bearer ${token}` } });
@@ -84,9 +84,7 @@ const [transaksiList, setTransaksiList] = useState<any[]>([]);
   
 // Modal informasi notifikasi
 const [infoModal, setInfoModal] = useState("");
-// Modal sukses
 const [successModal, setSuccessModal] = useState("");
-// Modal error
 const [errorModal, setErrorModal] = useState("");
   
 // Menyimpan transaksi yang akan dibatalkan
