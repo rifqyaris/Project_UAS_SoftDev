@@ -1,24 +1,40 @@
 "use client";
 
+// Import React Hooks untuk mengelola state dan lifecycle component
 import React, { useState, useEffect } from "react";
+
+// Import router untuk navigasi halaman
 import { useRouter } from "next/navigation";
+
+// Import Link untuk perpindahan halaman tanpa refresh
 import Link from "next/link";
 
 export default function UploadDonasiPage() {
+
+  // Menyimpan data pengguna yang sedang login
   const [user, setUser] = useState<any>(null);
+
+  // Menyimpan data form barang donasi
   const [namaBarang, setNamaBarang] = useState("");
   const [kategori, setKategori] = useState("Barang Bekas");
   const [deskripsi, setDeskripsi] = useState("");
   const [stok, setStok] = useState("");
   const [kondisi, setKondisi] = useState("");
+
+  // Menyimpan foto dalam format Base64
   const [fotoBase64, setFotoBase64] = useState("");
-  
+
+  // Menyimpan pesan error dan status modal berhasil
   const [errorMsg, setErrorMsg] = useState("");
   const [successModal, setSuccessModal] = useState(false);
+
   const router = useRouter();
 
+  // Mengecek apakah pengguna sudah login
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+
+    // Jika belum login maka diarahkan ke halaman unauthorized
     if (!storedUser) {
       router.push("/unauthorized");
     } else {
@@ -26,27 +42,42 @@ export default function UploadDonasiPage() {
     }
   }, [router]);
 
+  // Mengubah file gambar menjadi format Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
+
+      // Membaca file menggunakan FileReader
       const reader = new FileReader();
+
       reader.onloadend = () => {
+
+        // Menyimpan hasil konversi Base64
         setFotoBase64(reader.result as string);
       };
+
       reader.readAsDataURL(file);
     }
   };
 
+  // Fungsi submit form donasi
   const handleFormSubmit = async (e: React.FormEvent) => {
+
+    // Mencegah reload halaman saat submit
     e.preventDefault();
+
+    // Menghapus pesan error sebelumnya
     setErrorMsg("");
 
+    // Validasi seluruh field wajib diisi
     if (!namaBarang || !deskripsi || !stok || !kondisi || !fotoBase64) {
       setErrorMsg("Harap lengkapi semua formulir dan unggah foto asli barang!");
       return;
     }
 
     try {
+      // Mengirim data barang ke backend menggunakan metode POST
       const res = await fetch(
   "https://exquisite-acceptance-production-3bb9.up.railway.app/api/barang",
   {
@@ -67,12 +98,15 @@ export default function UploadDonasiPage() {
   }
 );
 
+      // Jika berhasil maka tampilkan modal sukses
       if (res.ok) {
         setSuccessModal(true);
       } else {
+        // Jika gagal tampilkan pesan error
         setErrorMsg("Gagal mengunggah barang donasi ke server.");
       }
     } catch (error) {
+      // Menangani error koneksi ke server
       console.error("Error submit donasi:", error);
       setErrorMsg("Terjadi kesalahan koneksi ke server Backend.");
     }
