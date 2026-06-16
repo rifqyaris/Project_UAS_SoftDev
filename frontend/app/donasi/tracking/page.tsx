@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react"; // Import React Hooks untuk state management dan lifecycle component
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+// Import Socket.IO Client untuk komunikasi real-time
 import { io } from "socket.io-client";
 
 const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
 const socket = io(API);
 
+// Komponen Navbar yang digunakan pada halaman tracking
 function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) {
   const unread = notifs?.filter((n: any) => !n.dibaca).length || 0;
   const markRead = async () => {
