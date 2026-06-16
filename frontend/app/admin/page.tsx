@@ -136,8 +136,8 @@ export default function AdminPage() {
                   {allTransactions.length === 0 ? (
                     <tr><td colSpan={6} className="text-center py-4 text-muted">Belum ada transaksi di platform ini.</td></tr>
                   ) : (
-                    allTransactions.slice().reverse().map((tx) => {
-                      let statusBadge = "bg-warning text-dark";
+                    allTransactions.slice().reverse().map((tx) => { // Menampilkan seluruh data transaksi yang tersimpan pada sistem
+                      let statusBadge = "bg-warning text-dark"; // Menentukan warna badge berdasarkan status transaksi
                       if (tx.status === "Disetujui") statusBadge = "bg-success text-white";
                       if (tx.status === "Ditolak") statusBadge = "bg-danger text-white";
                       if (tx.status === "Selesai") statusBadge = "bg-primary text-white";
