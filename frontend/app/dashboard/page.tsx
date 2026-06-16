@@ -1,11 +1,13 @@
 "use client";
 
+// Import library React, routing Next.js, dan Socket.IO
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { io } from "socket.io-client";
 
 const API = "https://exquisite-acceptance-production-3bb9.up.railway.app";
+// Inisialisasi koneksi realtime menggunakan Socket.IO
 const socket = io(API, {
   transports: ["websocket", "polling"],
 });
@@ -75,6 +77,7 @@ function Navbar({ user, notifs, onLogout, onRequireLogin, onNotifAction }: any) 
 }
 
 export default function DashboardPage() {
+  // Menyimpan data user dan list" barang
   const [user, setUser] = useState<any>(null);
   const [barangList, setBarangList] = useState<any[]>([]);
   const [notifs, setNotifs] = useState<any[]>([]);
@@ -95,6 +98,7 @@ export default function DashboardPage() {
 
   const router = useRouter();
 
+  // Mengambil data barang, notifikasi, dan transaksi dari server
   const loadData = useCallback(async (token: string | null) => {
     const headers: any = {};
     if (token) headers.Authorization = `Bearer ${token}`;
@@ -146,6 +150,7 @@ export default function DashboardPage() {
     };
   }, [user, loadData]);
 
+  // Memastikan user sudah login sebelum mengakses fitur tertentu
   const requireLogin = (actionOrPath: (() => void) | string) => {
     if (!user) {
       router.push("/unauthorized");
@@ -174,6 +179,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Mengirim permintaan pengambilan barang kepada donatur
   const handleConfirmRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -205,6 +211,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Mengubah status barang menjadi telah tersalurkan
   const handleMarkAsSold = (id: string) => {
     setConfirmAction({
       message: (
@@ -234,6 +241,7 @@ export default function DashboardPage() {
     });
   };
 
+  // Menghapus postingan barang oleh administrator
   const handleDeleteBarang = (id: string) => {
     setConfirmAction({
       message: (
@@ -263,6 +271,7 @@ export default function DashboardPage() {
     });
   };
 
+  // Menyetujui atau menolak permintaan barang dari peminat
   const handleKonfirmasiPermintaan = async (txId: string, statusBaru: string, namaBarang: string, peminatId: string) => {
     const token = localStorage.getItem("token");
     try {
@@ -289,6 +298,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => { localStorage.clear(); setUser(null); router.push("/"); };
 
+  // Memfilter daftar barang berdasarkan kategori dan kata kunci pencarian
   const filteredBarang = barangList.filter((item) => {
     const matchSearch = item.namaBarang.toLowerCase().includes(searchQuery.toLowerCase()) || (item.deskripsi && item.deskripsi.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchTab = activeTab === "Semua" ? true : item.kategori === activeTab;
@@ -375,7 +385,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {selectedItem && (() => {
+      {selectedItem && (() => { // Menampilkan informasi lengkap barang yang dipilih pengguna
         const isMyItem = user && selectedItem.donatur?.nama === user.nama;
         const isSold = selectedItem.status === "Tersalurkan";
         return (
