@@ -2,10 +2,7 @@
 
 // Import React Hooks untuk mengelola state dan lifecycle component
 import React, { useState, useEffect } from "react";
-
-// Import router untuk navigasi halaman
 import { useRouter } from "next/navigation";
-
 // Import Link untuk perpindahan halaman tanpa refresh
 import Link from "next/link";
 
@@ -112,6 +109,7 @@ export default function UploadDonasiPage() {
     }
   };
 
+  // Menunggu data user selesai dimuat
   if (!user) return null;
 
   return (
@@ -147,7 +145,7 @@ export default function UploadDonasiPage() {
 
             <div className="row mb-3 g-3">
               <div className="col-md-6">
-                <label className="form-label fw-bold small">Estimasi Stok / Berat</label>
+                <label className="form-label fw-bold small">Estimasi Berat / Stok</label>
                 <input type="text" className="form-control" value={stok} onChange={e => setStok(e.target.value)} placeholder="Contoh: 2 Kg / 5 Pcs" />
               </div>
               <div className="col-md-6">
