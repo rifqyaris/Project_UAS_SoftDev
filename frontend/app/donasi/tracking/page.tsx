@@ -122,8 +122,8 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    socket.emit("join_user_global", user._id); 
-    socket.on("notification", (data: any) => {
+    socket.emit("join_user_global", user._id); // Masuk ke room global berdasarkan id pengguna
+    socket.on("notification", (data: any) => { // Menampilkan popup ketika ada notifikasi baru
       setInfoModal(data.message); 
       const token = localStorage.getItem("token");
       if(token) loadData(token, user);
@@ -138,11 +138,13 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
     };
   }, [user, loadData]);
 
+  // Mengecek login sebelum mengakses halaman tertentu
   const requireLogin = (actionOrPath: (() => void) | string) => {
     if (typeof actionOrPath === "string") router.push(actionOrPath);
     else actionOrPath();
   };
 
+  // Mengarahkan pengguna ke halaman yang sesuai berdasarkan isi notifikasi
   const handleNotifAction = (pesan: string) => {
     if (pesan.includes("💬") || pesan.toLowerCase().includes("pesan")) {
       requireLogin("/chat");
@@ -153,15 +155,18 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
     }
   };
 
+  // Menghapus seluruh data sesi login dan kembali ke halaman utama
   const handleLogout = () => { localStorage.clear(); router.push("/"); };
 
+  // Mengubah status tracking transaksi
   const handleUpdateLiveTracking = async (tx: any, newTrackingText: string, customStatus?: string) => {
     const token = localStorage.getItem("token");
     const finalStatus = customStatus || tx.status;
     const isPenerima = user._id === tx.peminatId;
-    const targetNotifId = isPenerima ? tx.donaturId : tx.peminatId;
+    const targetNotifId = isPenerima ? tx.donaturId : tx.peminatId; // Menentukan penerima notifikasi setelah status diperbarui
 
     try {
+      // Mengirim perubahan tracking ke server
       const res = await fetch(`${API}/api/transaksi/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -174,6 +179,7 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
     } catch { setErrorModal("Terjadi kesalahan jaringan."); }
   };
 
+  // Mengirim permintaan pembatalan transaksi
   const handleCancelTransaksi = async (tx: any, alasan: string) => {
     const token = localStorage.getItem("token");
     try {
@@ -198,7 +204,7 @@ const [cancelReasonInput, setCancelReasonInput] = useState("");
           <h3 className="fw-bold text-dark mb-1">📍 Pelacakan Barang (Tracking)</h3>
         </div>
 
-        {transaksiList.length === 0 ? (
+        {transaksiList.length === 0 ? ( // Menampilkan seluruh transaksi milik pengguna
           <div className="card text-center p-5 border-0 text-muted shadow-sm rounded-4">
             <h5>Belum ada aktivitas transaksi.</h5>
           </div>
